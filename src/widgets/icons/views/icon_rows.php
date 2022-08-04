@@ -18,7 +18,7 @@ use yii\web\View;
  * @var $asset \yii\web\AssetBundle
  */
 $moduleCms = Yii::$app->getModule('cmsbridge');
-$moduleCms->frontendUrl = !empty($moduleCms->frontendUrl)? $moduleCms->frontendUrl : Yii::$app->params['platform']['frontendUrl'];
+$moduleCms->frontendUrl= Yii::$app->params['platform']['frontendUrl'];
 
 
 $classSpanStr = implode(' ', $widget->classSpan);
@@ -47,11 +47,7 @@ $script = <<< JS
     $('#{$cms_bridge_url}').click(function() {
 window.jCallback = function (data) {
      //let newTab = window.open();
-	//  window.location.href = '{$admin_url_front}';
-    
-        var url = '{$admin_url_front}';
-        window.open(url, '_blank');
-
+	 window.location.href = '{$admin_url_front}';
     };
         var csrf = '{$csrfToken}';
 

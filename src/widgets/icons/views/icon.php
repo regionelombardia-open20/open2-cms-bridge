@@ -16,7 +16,7 @@
  */
 
 $moduleCms = Yii::$app->getModule('cmsbridge');
-$moduleCms->frontendUrl = !empty($moduleCms->frontendUrl)? $moduleCms->frontendUrl : Yii::$app->params['platform']['frontendUrl'];
+$moduleCms->frontendUrl= Yii::$app->params['platform']['frontendUrl'];
 
 
 $classSpanStr = @join(' ', $widget->classSpan);
