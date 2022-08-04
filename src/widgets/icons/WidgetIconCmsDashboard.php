@@ -20,7 +20,7 @@ class WidgetIconCmsDashboard extends WidgetIcon {
         parent::init();
 
         $this->moduleCms = Yii::$app->getModule('cmsbridge');
-        $this->moduleCms->frontendUrl = Yii::$app->params['platform']['frontendCDUrl']; 
+        $this->moduleCms->frontendUrl = Yii::$app->params['platform']['frontendUrl']; 
         
         $this->setLabel(\Yii::t('amos\cmsbridge\widgets\icons', 'Cms'));
         $this->setDescription(Yii::t('amos\cmsbridge\widgets\icons', 'Cms'));

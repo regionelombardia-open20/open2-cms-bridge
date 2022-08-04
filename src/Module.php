@@ -66,4 +66,18 @@ class Module extends AmosModule implements ModuleInterface {
         ];
     }
 
+    
+     /**
+     *
+     * @return string
+     */
+    public function getFrontEndMenu($dept = 1)
+    {
+        $menu = parent::getFrontEndMenu();
+        $app  = \Yii::$app;
+        if (!$app->user->isGuest) {
+            $menu .= $this->addFrontEndMenu(Module::t('amoscmsbridge','#menu_front_cms'), Module::toUrlModule('admin/login/login-cms-admin',true),$dept, '_blank');
+        }
+        return $menu;
+    }
 }
