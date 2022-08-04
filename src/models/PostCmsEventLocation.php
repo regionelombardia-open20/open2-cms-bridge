@@ -1,17 +1,8 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
+namespace amos\cmsbridge\models;
 
-namespace open20\cmsbridge\models;
-
-use open20\cmsbridge\utility\CmsObject;
+use amos\cmsbridge\utility\CmsObject;
 
 class PostCmsEventLocation extends CmsObject
 {

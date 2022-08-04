@@ -15,6 +15,10 @@
  * @var $asset \yii\web\AssetBundle
  */
 
+$moduleCms = Yii::$app->getModule('cmsbridge');
+$moduleCms->frontendUrl= Yii::$app->params['platform']['frontendUrl'];
+
+
 $classSpanStr = @join(' ', $widget->classSpan);
 $classSpanLi = @join(' ', $widget->classLi);
 $classSpanA = @join(' ', $widget->classA);
@@ -30,9 +34,9 @@ use open20\amos\mobile\bridge\modules\v1\models\User as TokenUser;
 
 $user = TokenUser::findOne(Yii::$app->user->id);
 $token = $user->refreshAccessToken('webcms', 'cms')->access_token;
-$url_front = Yii::$app->params['platform']['frontendUrl'] . '/admin/login/login-amos';
-$base_url_front = Yii::$app->params['platform']['frontendUrl'];
-$admin_url_front = Yii::$app->params['platform']['frontendUrl'] . '/admin';
+$url_front = $moduleCms->frontendUrl . '/admin/login/login-amos';
+$base_url_front = $moduleCms->frontendUrl;
+$admin_url_front = $moduleCms->frontendUrl . '/admin';
 $csrfParam = Yii::$app->request->csrfParam;
 $csrfToken = Yii::$app->request->csrfToken;
 $script = <<< JS

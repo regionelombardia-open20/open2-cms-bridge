@@ -1,21 +1,12 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
+namespace amos\cmsbridge\utility;
 
-namespace open20\cmsbridge\utility;
-
-use open20\cmsbridge\models\CmsResultCreatePage;
-use open20\cmsbridge\models\CmsResultFormat;
-use open20\cmsbridge\models\CmsResultHtmlPage;
-use open20\cmsbridge\models\CmsResultPage;
-use open20\cmsbridge\models\PostCmsCreatePage;
+use amos\cmsbridge\models\CmsResultCreatePage;
+use amos\cmsbridge\models\CmsResultFormat;
+use amos\cmsbridge\models\CmsResultHtmlPage;
+use amos\cmsbridge\models\CmsResultPage;
+use amos\cmsbridge\models\PostCmsCreatePage;
 use open20\amos\mobile\bridge\modules\v1\models\User as TokenUser;
 use Exception;
 use Yii;
@@ -28,9 +19,15 @@ class CmsUtility
     protected $client;
     protected $loginCookies = null;
 
+    /**
+     * @var Module $moduleCms
+     */
+    protected $moduleCms = null;
+    
     public function __construct()
     {
         $this->client = new Client();
+        $this->moduleCms = Yii::$app->getModule('cmsbridge');
     }
 
     /**
@@ -39,13 +36,13 @@ class CmsUtility
      * @return integer
      */
     public function loginCms()
-    {
+    {   
         $user_id = 0;
 
         try {
             $user      = TokenUser::findOne(Yii::$app->user->id);
             $token     = $user->refreshAccessToken('webcms', 'cms')->access_token;
-            $url_front = Yii::$app->params['platform']['frontendUrl'].'/admin/login/login-amos';
+            $url_front = $this->moduleCms->frontendUrl.'/admin/login/login-amos';
 
             $response = $this->client->createRequest()
                 ->setMethod('GET')
@@ -90,7 +87,18 @@ class CmsUtility
      */
     public function createCmsPage(PostCmsCreatePage $page): CmsResultCreatePage
     {
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/create-page';
+        $url_front = $this->moduleCms->frontendUrl . '/api/1/create-page';
+        return $this->pageRestClient($url_front, $page, CmsResultFormat::JSON);
+    }
+
+    /**
+     *
+     * @param PostCmsCreatePage $page
+     * @return boolean
+     */
+    public function deleteCmsPage(PostCmsCreatePage $page): CmsResultCreatePage
+    {
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/delete-page';
         return $this->pageRestClient($url_front, $page, CmsResultFormat::JSON);
     }
 
@@ -101,7 +109,7 @@ class CmsUtility
      */
     public function getPreviewUrlCmsPage(PostCmsCreatePage $page): CmsResultCreatePage
     {
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/preview-page';
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/preview-page';
         return $this->pageRestClient($url_front, $page, CmsResultFormat::JSON);
     }
 
@@ -112,7 +120,7 @@ class CmsUtility
      */
     public function getPreviewUrlCmsPageHtml(PostCmsCreatePage $page): CmsResultHtmlPage
     {
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/preview-page-html';
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/preview-page-html';
         return $this->pageRestClient($url_front, $page, CmsResultFormat::HTML);
     }
 
@@ -123,7 +131,7 @@ class CmsUtility
      */
     public function updateCmsPage(PostCmsCreatePage $page): CmsResultCreatePage
     {
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/update-page';
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/update-page';
         return $this->pageRestClient($url_front, $page, CmsResultFormat::JSON);
     }
 
@@ -136,34 +144,69 @@ class CmsUtility
     protected function pageRestClient(string $url, PostCmsCreatePage $page,
                                       string $format): CmsResultPage
     {
-        
-        $response       = $this->client->createRequest()
-            ->setMethod('POST')
-            ->setUrl($url)
-            ->setCookies($this->loginCookies)
-            ->setData([
-                'nav_id' => $page->nav_id,
-                'is_draft' => $page->is_draft,
-                'alias' => $page->alias,
-                'description' => $page->description,
-                'title' => $page->title,
-                'from_draft_id' => $page->from_draft_id,
-                'lang_id' => $page->lang_id,
-                'layout_id' => $page->layout_id,
-                'nav_container_id' => $page->nav_container_id,
-                'parent_nav_id' => $page->parent_nav_id,
-                'use_draft' => $page->use_draft,
-                'cms_user_id' => $page->cms_user_id,
-                'with_login' => $page->with_login,
-                'form_landing' => $page->form_landing->json_encode(),
-                'event_data' => $page->event_data->json_encode(),
-                ]
-            )
-            ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->send();
-        $result         = CmsResultFormat::format($format);
-        $result->build($response->content);
-        $result->status = $response->isOk;
+
+        try {
+
+            $response = $this->client->createRequest()
+                ->setMethod('POST')
+                ->setUrl($url)
+                ->setCookies($this->loginCookies)
+                ->setData([
+                        'nav_id' => $page->nav_id,
+                        'is_draft' => $page->is_draft,
+                        'alias' => $page->alias,
+                        'description' => $page->description,
+                        'title' => $page->title,
+                        'from_draft_id' => $page->from_draft_id,
+                        'lang_id' => $page->lang_id,
+                        'layout_id' => $page->layout_id,
+                        'nav_container_id' => $page->nav_container_id,
+                        'parent_nav_id' => $page->parent_nav_id,
+                        'use_draft' => $page->use_draft,
+                        'cms_user_id' => $page->cms_user_id,
+                        'with_login' => $page->with_login,
+                        'form_landing' => $page->form_landing->json_encode(),
+                        'event_data' => $page->event_data->json_encode(),
+                    ]
+                )
+                ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+                ->setOptions([
+                    'timeout' => 600, // set timeout to 600 seconds for the case server is not responding
+                ])
+                ->send();
+            $result = CmsResultFormat::format($format);
+            $result->build($response->content);
+            $result->status = $response->isOk;
+
+//            $myfile = fopen("error_luya.txt", "a") or die("Unable to open file!");
+//            $txt = "OK ----- ".date('d-m-Y H:i:s')."\n";
+//            fwrite($myfile, $txt);
+//            $txt = json_encode($result)."\n";
+//            fwrite($myfile, $txt);
+//            $txt = "-----------------------\n";
+//            fwrite($myfile, $txt);
+//            fclose($myfile);
+        }catch (\yii\base\Exception $e){
+
+
+            $myfile = fopen("error_luya.txt", "a") or die("Unable to open file!");
+            $txt = "ERROR ----- ". date('d-m-Y H:i:s')."\n";
+            fwrite($myfile, $txt);
+
+            $txt = $e->getMessage()."\n";
+            fwrite($myfile, $txt);
+            $txt = $e->getTraceAsString()."\n";
+            fwrite($myfile, $txt);
+            $txt = $e->getFile().' '. $e->getLine()."\n";
+            fwrite($myfile, $txt);
+            $txt = '#####'.json_encode($result)."\n";
+            fwrite($myfile, $txt);
+            $txt = "-----------------------\n";
+            fwrite($myfile, $txt);
+            fclose($myfile);
+            $result = new CmsResultCreatePage();
+
+        }
         return $result;
     }
 
@@ -175,7 +218,7 @@ class CmsUtility
     {
         $templates = [];
 
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/list-templates';
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/list-templates';
 
         $client   = new Client();
         $response = $client->createRequest()
@@ -200,7 +243,7 @@ class CmsUtility
     {
         $languages = [];
 
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/list-languages';
+        $url_front = $this->moduleCms->frontendUrl.'/api/1/list-languages';
 
         $client   = new Client();
         $response = $client->createRequest()
@@ -215,5 +258,35 @@ class CmsUtility
         }
 
         return $languages;
+    }
+
+    /**
+     * @param $alias
+     * @param null $nav_id
+     * @return bool|mixed
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\httpclient\Exception
+     */
+    public function isUrlOk($alias, $nav_id = null)
+    {
+
+        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/is-new-alias-valid';
+
+        $client   = new Client();
+        $response = $client->createRequest()
+            ->setMethod('GET')
+            ->setCookies($this->loginCookies)
+            ->setUrl($url_front)
+            ->setData([
+                'nav_id' => $nav_id,
+                'alias' => $alias
+            ])
+            ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
+            ->send();
+        if ($response->isOk) {
+            return $response->data;
+        }
+
+        return false;
     }
 }

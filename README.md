@@ -1,4 +1,4 @@
-# Open20 Cms Bridge #
+# Amos Cms Bridge #
 
 Cms bridge. Bridge to connect backend to frontend.
 
@@ -7,26 +7,26 @@ Cms bridge. Bridge to connect backend to frontend.
 
 add to composer requirements in composer.json
 ```
-"/open20/cms-bridge": "dev-master as 1.0.0",
+"/amos/cms-bridge": "dev-master as 1.0.0",
 ```
 
 or run command bash:
 ```bash
-composer require "open20/cms-bridge": "dev-master as 1.0.0"
+composer require "amos/cms-bridge": "dev-master as 1.0.0"
 ```
 
 add Places migrations to console modules (console/config/migrations-amos.php):
 ```
-'@vendor/open20/cms-bridge/src/migrations'
+'@vendor/amos/cms-bridge/src/migrations'
 ```
-Add module to your modules-open20 config in backend:
+Add module to your modules-amos config in backend:
         
 ```php
 	<?php
 	$config = [
 		'modules' => [
 			'cmsbridge' => [
-                            'class' => 'open20\cmsbridge\Module',
+                            'class' => 'amos\cmsbridge\Module',
                         ],
 		],
 	];

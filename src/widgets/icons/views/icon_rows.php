@@ -9,11 +9,18 @@
  * @category   CategoryName
  */
 
+use open20\amos\core\icons\AmosIcons;
+use open20\amos\mobile\bridge\modules\v1\models\User as TokenUser;
+use yii\web\View; 
 /**
  * @var $this \yii\web\View
  * @var $widget \open20\amos\core\widget\WidgetIcon
  * @var $asset \yii\web\AssetBundle
  */
+$moduleCms = Yii::$app->getModule('cmsbridge');
+$moduleCms->frontendUrl= Yii::$app->params['platform']['frontendUrl'];
+
+
 $classSpanStr = implode(' ', $widget->classSpan);
 $classSpanLi = implode(' ', $widget->classLi);
 $classSpanA = implode(' ', $widget->classA);
@@ -24,24 +31,24 @@ $url = is_array($widget->url) ? \yii\helpers\Url::to($widget->url) : $widget->ur
 $target = ((strlen($widget->targetUrl) > 0) ? 'target="' . $widget->targetUrl . '" ' : '');
 $dataModule = $widget->moduleName;
 
-use open20\amos\core\icons\AmosIcons;
-use open20\amos\mobile\bridge\modules\v1\models\User as TokenUser;
 
 $user = TokenUser::findOne(Yii::$app->user->id);
 $token = $user->refreshAccessToken('webcms', 'cms')->access_token;
-$url_front = Yii::$app->params['platform']['frontendUrl'] . '/admin/login/login-amos';
-$base_url_front = Yii::$app->params['platform']['frontendUrl'];
-$admin_url_front = Yii::$app->params['platform']['frontendUrl'] . '/admin';
+$url_front = $moduleCms->frontendUrl . '/admin/login/login-amos';
+$base_url_front = $moduleCms->frontendUrl;
+$admin_url_front = $moduleCms->frontendUrl . '/admin';
 $csrfParam = Yii::$app->request->csrfParam;
 $csrfToken = Yii::$app->request->csrfToken;
+
+$cms_bridge_url = 'cms_bridge_url-' . substr(uniqid(), -3);
 $script = <<< JS
+
+
+    $('#{$cms_bridge_url}').click(function() {
 window.jCallback = function (data) {
      //let newTab = window.open();
 	 window.location.href = '{$admin_url_front}';
     };
-
-    $('#cms_bridge_url').click(function() {
-
         var csrf = '{$csrfToken}';
 
         $.ajax({
@@ -71,13 +78,13 @@ window.jCallback = function (data) {
     });
 
 JS;
-$this->registerJs($script);
+$this->registerJs($script, View::POS_END);
 ?>
 
 <div class="square-box" data-code="<?= $className ?>">
     <div class="square-content item-widget" data-code="<?= $className ?>">
         <?php if (strlen($url)): ?>
-            <a id="cms_bridge_url" data-module="<?= $dataModule ?>" class="<?= $classSpanA ?> dashboard-menu-item" href="#"
+            <a id="<?= $cms_bridge_url ?>" data-module="<?= $dataModule ?>" class="<?= $classSpanA ?> dashboard-menu-item" href="#"
            <?= $target ?>title="<?= $widget->description ?>" role="menuitem" class="sortableOpt1" <?= $widget->dataPjaxZero ?> <?= $widget->attributes ?>>
         <?php else: ?>
             <div class="dashboard-menu-item">

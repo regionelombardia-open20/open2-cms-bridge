@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
-
-namespace open20\cmsbridge\widgets\icons;
+namespace amos\cmsbridge\widgets\icons;
 
 use open20\amos\core\views\assets\AmosCoreAsset;
 use open20\amos\core\widget\WidgetAbstract;
@@ -20,11 +11,19 @@ use yii\helpers\ArrayHelper;
 
 class WidgetIconCmsDashboard extends WidgetIcon {
 
+    /**
+     * @var Module $moduleCms
+     */
+    private $moduleCms = null;
+       
     public function init() {
         parent::init();
 
-        $this->setLabel(\Yii::t('open20\cmsbridge\widgets\icons', 'Cms'));
-        $this->setDescription(Yii::t('open20\cmsbridge\widgets\icons', 'Cms'));
+        $this->moduleCms = Yii::$app->getModule('cmsbridge');
+        $this->moduleCms->frontendUrl = Yii::$app->params['platform']['frontendCDUrl']; 
+        
+        $this->setLabel(\Yii::t('amos\cmsbridge\widgets\icons', 'Cms'));
+        $this->setDescription(Yii::t('amos\cmsbridge\widgets\icons', 'Cms'));
 
         $this->setIcon('linmodulo');
         //$this->setIconFramework();
@@ -34,7 +33,7 @@ class WidgetIconCmsDashboard extends WidgetIcon {
          * check params from platform/backend/config/params.php
          */
         // get params from platform/common/config/params-local.php
-        $this->setUrl(Yii::$app->params['platform']['frontendUrl'] . '/admin');
+        $this->setUrl($this->moduleCms->frontendUrl . '/admin');
         
         $this->setCode('Cms');
         $this->setModuleName('Cms');

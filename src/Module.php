@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
-
-namespace open20\cmsbridge;
+namespace amos\cmsbridge;
 
 use open20\amos\core\module\AmosModule;
 use open20\amos\core\module\ModuleInterface;
@@ -29,6 +20,8 @@ class Module extends AmosModule implements ModuleInterface {
 
     public $config = [];
 
+    public $frontendUrl = '';
+    
     /**
      * @inheritdoc
      */
@@ -45,6 +38,8 @@ class Module extends AmosModule implements ModuleInterface {
         $config = require(__DIR__ . DIRECTORY_SEPARATOR . self::$CONFIG_FOLDER . DIRECTORY_SEPARATOR . 'config.php');
 
         Yii::configure($this, $config);
+        
+        $this->frontendUrl = Yii::$app->params['platform']['frontendUrl'];
     }
 
     /**

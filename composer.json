@@ -1,8 +1,8 @@
 {
-    "name": "open20/cmsbridge",
-    "description": "Open20 Cms Brigde",
+    "name": "amos/cmsbridge",
+    "description": "Amos Cms Brigde",
     "keywords": [
-        "Open20",
+        "amos",
         "Bridge"
     ],
     "homepage": "",
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "open20\\cmsbridge\\": "src"
+            "amos\\cmsbridge\\": "src"
         }
     }
     

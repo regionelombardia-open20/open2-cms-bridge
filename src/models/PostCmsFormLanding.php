@@ -1,17 +1,8 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
+namespace amos\cmsbridge\models;
 
-namespace open20\cmsbridge\models;
-
-use open20\cmsbridge\utility\CmsObject;
+use amos\cmsbridge\utility\CmsObject;
 
 
 
@@ -22,6 +13,7 @@ class PostCmsFormLanding extends CmsObject
     public $twitter_reg;
     public $linkedin_reg;
     public $goolge_reg;
+    public $apple_reg;
     public $spid_cns_reg;
     public $user_name_reg;
     public $ask_sex;
@@ -32,6 +24,15 @@ class PostCmsFormLanding extends CmsObject
     public $ask_fiscal_code;
     public $ask_company;
     public $ask_tags;
+
+    public $ask_sex_required;
+    public $ask_age_required;
+    public $ask_county_required;
+    public $ask_city_required;
+    public $ask_telefon_required;
+    public $ask_fiscal_code_required;
+    public $ask_company_required;
+    public $ask_tags_required;
 
     public $tks_you_page_message;
     public $waiting_page_message;
