@@ -9,10 +9,16 @@ use amos\cmsbridge\models\CmsResultPage;
 use amos\cmsbridge\models\PostCmsCreatePage;
 use open20\amos\mobile\bridge\modules\v1\models\User as TokenUser;
 use Exception;
+use luya\admin\models\Lang;
+use luya\cms\admin\helpers\MenuHelper;
+use open20\luya\admin\module\models\NavItem;
+use open20\luya\frontend\api\utility\CmsLandigBuilder;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\httpclient\Client;
 use yii\log\Logger;
+use yii\web\Response;
 
 class CmsUtility
 {
@@ -226,23 +232,28 @@ class CmsUtility
      */
     public function getCmsTemplates()
     {
-        $templates = [];
+        $drafts = MenuHelper::getDrafts();
 
-        $url_front = $this->moduleCms->frontendUrl.'/api/1/list-templates';
+        $removeIds = [];
 
-        $client   = new Client();
-        $response = $client->createRequest()
-            ->setMethod('GET')
-            ->setCookies($this->loginCookies)
-            ->setUrl($url_front)
-            ->setData([])
-            ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->send();
-        if ($response->isOk) {
-            $templates = $response->data;
+        $landing   = new CmsLandigBuilder();
+
+        foreach ($drafts as $draft) {
+            $data = $landing->getDataFromTemplate($draft['id']);
+            if (!is_null($data)) {
+                $removeIds[] = $data->already_present_template_page_id;
+                $removeIds[] = $data->tks_template_page_id;
+                $removeIds[] = $data->waiting_template_page_id;
+            }
+        }
+        foreach ($drafts as $draft) {
+
+            if (ArrayHelper::isIn($draft['id'], $removeIds)) {
+                ArrayHelper::removeValue($drafts, $draft);
+            }
         }
 
-        return $templates;
+        return $drafts;
     }
 
     /**
@@ -251,22 +262,12 @@ class CmsUtility
      */
     public function getCmsLanguages()
     {
-        $languages = [];
+        $languages                   = [];
+        $request                     = Yii::$app->request;
 
-        $url_front = $this->moduleCms->frontendUrl.'/api/1/list-languages';
-
-        $client   = new Client();
-        $response = $client->createRequest()
-            ->setMethod('GET')
-            ->setUrl($url_front)
-            ->setCookies($this->loginCookies)
-            ->setData([])
-            ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->send();
-        if ($response->isOk) {
-            $languages = $response->data;
+        if ($request->isAjax) {
+            $languages = Lang::getQuery();
         }
-
         return $languages;
     }
 
@@ -279,24 +280,9 @@ class CmsUtility
      */
     public function isUrlOk($alias, $nav_id = null)
     {
-
-        $url_front = Yii::$app->params['platform']['frontendUrl'].'/api/1/is-new-alias-valid';
-
-        $client   = new Client();
-        $response = $client->createRequest()
-            ->setMethod('GET')
-            ->setCookies($this->loginCookies)
-            ->setUrl($url_front)
-            ->setData([
-                'nav_id' => $nav_id,
-                'alias' => $alias
-            ])
-            ->setHeaders(['X-Requested-With' => 'XMLHttpRequest'])
-            ->send();
-        if ($response->isOk) {
-            return $response->data;
-        }
-
-        return false;
+        $count = NavItem::find()
+            ->andWhere(['alias' => $alias])
+            ->andFilterWhere(['!=','nav_id', $nav_id])->count();
+        return $count == 0;
     }
 }
