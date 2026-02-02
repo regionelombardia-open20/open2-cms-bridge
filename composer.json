@@ -10,7 +10,9 @@
     "require": {
         "php": ">=5.4.0",
         "open20/amos-core": ">=1.9",
-        "open20/amos-mobile-bridge": ">=1.0"
+        "open20/amos-mobile-bridge": ">=1.0",
+        "open20/luya-admin-module": "*",
+        "open20/luya-frontend-api": "*"
     },
     "autoload": {
         "psr-4": {

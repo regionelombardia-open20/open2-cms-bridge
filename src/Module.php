@@ -23,12 +23,6 @@ class Module extends AmosModule implements ModuleInterface {
     public $frontendUrl = '';
     
     /**
-     * Set the role to use to access the cms
-     * @var string $roleCms
-     */
-    public $roleCms = 'CMS';
-
-    /**
      * @inheritdoc
      */
     public static function getModuleName() {
@@ -81,7 +75,7 @@ class Module extends AmosModule implements ModuleInterface {
     {
         $menu = parent::getFrontEndMenu();
         $app  = \Yii::$app;
-        if (!$app->user->isGuest && ($app->user->can('ADMIN') || $app->user->can($this->roleCms))) {
+        if (!$app->user->isGuest) {
             $menu .= $this->addFrontEndMenu(Module::t('amoscmsbridge','#menu_front_cms'), Module::toUrlModule('admin/login/login-cms-admin',true),$dept, '_blank');
         }
         return $menu;
