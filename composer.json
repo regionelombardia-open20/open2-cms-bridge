@@ -1,5 +1,6 @@
 {
     "name": "amos/cmsbridge",
+    "license": "GPL-3.0-or-later",
     "description": "Amos Cms Brigde",
     "keywords": [
         "amos",
